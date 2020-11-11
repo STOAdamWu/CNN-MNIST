@@ -59,7 +59,7 @@ class Trainer:
             print('Cuda is not supported. Training can be very slow.')
         self.optimizer = optim.Adam(model.parameters())
         
-    def train(self, trainset, epochs, val = None):
+    def train(self, trainset, epochs, val = None, test_train_acc = True):
         model = self.model
         model.train()
         optimizer = self.optimizer
@@ -80,10 +80,18 @@ class Trainer:
                 i += 1
                 print('(Epcho %d / %d) Training process : %.3f%%'%(epoch+1, epochs, 100*i/total),end='\r')
             time_end = time.time()
-            print(' '*50, end = '\r')
-            print('(Epcho %d / %d) Done in time %.3f s'%(epoch+1, epochs, time_end-time_start))
+            print('(Epcho %d / %d) Done in time %.3f s'%(epoch+1, epochs, time_end-time_start)+' '*40, end = '\r')
+            msg = '(Epcho %d / %d) Done in time %.3f s  '%(epoch+1, epochs, time_end-time_start)
+            if test_train_acc:
+                train_acc = self.test(trainset,False)
+                msg += 'Train_acc : %.3f%%  '%(train_acc*100)
+            if val:
+                val_acc = self.test(val, False)
+                msg += 'Validation_acc : %.3f%% '%(val_acc*100)
+            print(msg)
+                
             
-    def test(self,testset):
+    def test(self,testset, verbose = True):
         model = self.model
         with torch.no_grad():
             model.eval()
@@ -99,8 +107,8 @@ class Trainer:
                     if torch.argmax(i) == y[idx]:
                         correct += 1
                     total += 1
-
-            print("TestAccuracy: %f%%"%(100*correct/total))
+            if verbose:
+                print("TestAccuracy: %f%%"%(100*correct/total))
         return correct/total
         
         
