@@ -2,6 +2,7 @@ import torch.nn as nn
 import torch.nn.functional as F 
 import torch
 import torch.optim as optim
+import time
 
 class CNN(nn.Module):
     def __init__(self, conv_paras, input_dim = 28, channels = 1, classes = 10, hd = 500, bn = False):
@@ -56,7 +57,7 @@ class Trainer:
         model.train()
         optimizer = self.optimizer
         for epoch in range(epochs):
-            
+            time_start = time.time()
             total = len(trainset)
             i = 0
             for data in trainset:  
@@ -70,10 +71,12 @@ class Trainer:
                 loss.backward()
                 optimizer.step()
                 i += 1
-                print('Epcho %d Training process : %.3f%%'%(epoch+1, i/total),end='\r')
-            print('Epcho %d Done'%(epoch+1))
+                print('(Epcho %d / %d) Training process : %.3f%%'%(epoch+1, epochs, i/total),end='\r')
+            time_end = time.time()
+            print(' '*50, end = '\r')
+            print('(Epcho %d / %d) Done in time %.3f s'%(epoch+1, epochs, time_end-time_start))
             
-    def test(testset):
+    def test(self,testset):
         model = self.model
         with torch.no_grad():
             model.eval()
@@ -81,13 +84,16 @@ class Trainer:
             total = 0
             for data in testset:
                 X, y = data
+                if self.cuda:
+                    X = X.cuda()
+                    y = y.cuda()
                 output = model(X)
                 for idx, i in enumerate(output):
                     if torch.argmax(i) == y[idx]:
                         correct += 1
                     total += 1
 
-            print("TestAccuracy: %f"%(correct/total))
+            print("TestAccuracy: %f%%"%(100*correct/total))
         return correct/total
         
         
