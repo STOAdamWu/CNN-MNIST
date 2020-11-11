@@ -78,7 +78,7 @@ class Trainer:
                 loss.backward()
                 optimizer.step()
                 i += 1
-                print('(Epcho %d / %d) Training process : %.3f%%'%(epoch+1, epochs, i/total),end='\r')
+                print('(Epcho %d / %d) Training process : %.3f%%'%(epoch+1, epochs, 100*i/total),end='\r')
             time_end = time.time()
             print(' '*50, end = '\r')
             print('(Epcho %d / %d) Done in time %.3f s'%(epoch+1, epochs, time_end-time_start))
