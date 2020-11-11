@@ -44,12 +44,14 @@ class CNN(nn.Module):
         return F.log_softmax(x, dim = 1)
     
 class Trainer:
-    def __init__(self, model, cuda = False):
+    def __init__(self, model):
         self.model = model
-        self.cuda = cuda
-        if cuda:
-            self.model = self.model.cuda()
-        
+        self.cuda = torch.cuda.is_available()
+        if self.cuda:
+            self.model = model.cuda()
+            print('Cuda Enabled')
+        else:
+            print('Cuda is not supported. Training can be very slow.')
         self.optimizer = optim.Adam(model.parameters())
         
     def train(self, trainset, epochs, val = None):
