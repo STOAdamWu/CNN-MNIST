@@ -25,6 +25,11 @@ class CNN(nn.Module):
         self.conv_output_dim = conv_output_dim
         self.affine1 = nn.Linear(self.conv_output_dim, hd)
         self.affine2 = nn.Linear(hd, classes)
+        
+        self.Conv_layers = nn.ModuleList()
+        self.Conv_layers.extend(self.convs)
+        if self.bn:
+            self.Conv_layers.extend(self.bns)
                 
     def forward(self, x):
         bn = self.bn
@@ -37,7 +42,7 @@ class CNN(nn.Module):
         for i in range(1,len(self.convs)):
             x = F.relu( self.convs[i](x) )
             if bn:
-                x = self.bns[i][x]
+                x = self.bns[i](x)
             x = F.max_pool2d(x, self.conv_paras[i]['pl'])
         x = F.relu(self.affine1(x.reshape(-1,self.conv_output_dim)))
         x = self.affine2(x)
@@ -73,7 +78,7 @@ class Trainer:
                 loss.backward()
                 optimizer.step()
                 i += 1
-                print('(Epcho %d / %d) Training process : %.3f%%'%(epoch+1, epochs, i/total),end='\r')
+                print('(Epcho %d / %d) Training process : %.3f%%'%(epoch+1, epochs, 100*i/total),end='\r')
             time_end = time.time()
             print(' '*50, end = '\r')
             print('(Epcho %d / %d) Done in time %.3f s'%(epoch+1, epochs, time_end-time_start))
