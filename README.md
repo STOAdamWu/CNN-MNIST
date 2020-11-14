@@ -1,3 +1,3 @@
 # CNN-MNIST
 
-Implement a CNN with pytorch trying to reach as high accuarcy on MNIST dataset as possible.
+Implement a three Layer CNN with pytorch reach 1.02% test error on MNIST.
